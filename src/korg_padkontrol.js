@@ -169,23 +169,25 @@ var selectedTrack = host.mTrackSelection.mMixerChannel.mValue
 mainPage.makeValueBinding(knob1.mSurfaceValue, selectedTrack.mVolume)
 mainPage.makeValueBinding(knob2.mSurfaceValue, selectedTrack.mPan)
 
-// Row 1: Mute, Solo, Channel Editor (Selected Track)
-// Mute uses a command binding ('Edit' > 'Mute') instead of a value binding
-// to work around a known MIDI Remote API issue with mMute on the selected track.
+// Row 1:
 bindPad(1).toCommand(mainPage, 'Edit', 'Mute')
 bindPad(2).toValue(mainPage, selectedTrack.mSolo)
 bindPad(3).toValue(mainPage, selectedTrack.mEditorOpen)
+bindPad(4).toCommand(mainPage, 'Macro', 'Quick Sketch Record')
 
-// Row 2: Macros
-bindPad(5).toCommand(mainPage, 'Macro', 'Quick Sketch Record')
+// Row 2:
+bindPad(5).toCommand(mainPage, 'Project', 'Tap Tempo')
+bindPad(6).toCommand(mainPage, 'Devices', 'Mixer 2')
+bindPad(7).toCommand(mainPage, 'Devices', 'Mixer 3')
+bindPad(8).toCommand(mainPage, 'Devices', 'Mixer 4')
 
-// Row 3: Track Navigation & Edit
+// Row 3:
 bindPad(9).toAction(mainPage, host.mTrackSelection.mAction.mPrevTrack)
 bindPad(10).toAction(mainPage, host.mTrackSelection.mAction.mNextTrack)
 bindPad(11).toCommand(mainPage, 'Edit', 'Undo')
 bindPad(12).toCommand(mainPage, 'Edit', 'Redo')
 
-// Row 4: Transport — bind via .mValue for automatic icon feedback
+// Row 4:
 var transport = host.mTransport.mValue
 bindPad(13).toValue(mainPage, transport.mStart)
 bindPad(14).toValue(mainPage, transport.mRecord)
