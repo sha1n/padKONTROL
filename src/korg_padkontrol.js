@@ -1,9 +1,9 @@
 //-----------------------------------------------------------------------------
-// Korg padKontrol - Cubase MIDI Remote Script
+// Korg padKONTROL - Cubase MIDI Remote Script
 //-----------------------------------------------------------------------------
 
 var midiremote_api = require('midiremote_api_v1')
-var deviceDriver = midiremote_api.makeDeviceDriver('Korg', 'padKontrol', 'User')
+var deviceDriver = midiremote_api.makeDeviceDriver('Korg', 'padKONTROL', 'Shai Nagar')
 
 var midiInput = deviceDriver.mPorts.makeMidiInput()
 var midiOutput = deviceDriver.mPorts.makeMidiOutput()
@@ -23,7 +23,7 @@ knob1.mSurfaceValue.mMidiBinding.setInputPort(midiInput).bindToControlChange(9, 
 knob2.mSurfaceValue.mMidiBinding.setInputPort(midiInput).bindToControlChange(9, 73)
 
 // 2. SCENE NOTE MAP
-// Explicit note map matching the Korg padKontrol factory Scene 16 (GM Drum layout).
+// Explicit note map matching the Korg padKONTROL factory Scene 16 (GM Drum layout).
 // Each row is [col0, col1, col2, col3] from left to right.
 // The script auto-selects Scene 16 on activation (see mOnActivate below).
 var scene = [
@@ -198,10 +198,10 @@ bindPad(16).toValue(mainPage, transport.mCycleActive)
 
 
 deviceDriver.mOnActivate = function (activeDevice) {
-    console.log('--- [Korg padKontrol] ACTIVE ---')
+    console.log('--- [Korg padKONTROL] ACTIVE ---')
 
-    // Switch padKontrol to Scene 16 (0x0F) via SysEx.
-    // Byte breakdown: F0=SysEx, 42=Korg, 40=GlobalCh1, 6E 08=padKontrol,
+    // Switch padKONTROL to Scene 16 (0x0F) via SysEx.
+    // Byte breakdown: F0=SysEx, 42=Korg, 40=GlobalCh1, 6E 08=padKONTROL,
     //                 1F=DataDump, 14=SceneChange, 0F=Scene16, F7=End
     midiOutput.sendMidi(activeDevice, [0xF0, 0x42, 0x40, 0x6E, 0x08, 0x1F, 0x14, 0x0F, 0xF7])
     console.log('Sent SysEx: Scene 16 selected')
