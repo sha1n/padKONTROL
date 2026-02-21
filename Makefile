@@ -1,8 +1,8 @@
 # Makefile for padKontrol Cubase MIDI Remote Script
 
 WORKSPACE_FILE = src/korg_padkontrol.js
-CUBASE_LOCAL_DIR = $(HOME)/Documents/Steinberg/Cubase/MIDI Remote/Driver Scripts/Local/Korg/padKontrol
-CUBASE_FILE = $(CUBASE_LOCAL_DIR)/Korg_padKontrol.js
+CUBASE_LOCAL_DIR = $(HOME)/Documents/Steinberg/Cubase/MIDI Remote/Driver Scripts/Local/Korg/padKONTROL
+CUBASE_FILE = $(CUBASE_LOCAL_DIR)/Korg_padKONTROL.js
 
 .PHONY: deploy verify clean help
 
