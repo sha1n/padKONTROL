@@ -8,8 +8,8 @@ This project provides a custom MIDI Remote script for the **Korg padKontrol** MI
 ## Features
 *   **Visual Integration:** Correct 4x4 pad grid and knob layout in the Cubase Surface Editor.
 *   **Mixer Control:** Knob 1 → Volume, Knob 2 → Pan of the selected track.
-*   **Channel Strip (Row 1):** Pads 1-3 toggle Mute, Solo, and Channel Editor for the selected track.
-*   **Macros (Row 2):** Pad 5 triggers the Quick Sketch Record macro.
+*   **Channel Strip & Macros (Row 1):** Pads 1-3 toggle Mute, Solo, and Channel Editor. Pad 4 triggers Quick Sketch Record macro.
+*   **Devices & Tempo (Row 2):** Pad 5 taps tempo; Pads 6-8 open MixConsole 2, 3, and 4.
 *   **Navigation (Row 3):** Pads 9-10 select Prev/Next track; Pads 11-12 trigger Undo/Redo.
 *   **Transport (Row 4):** Pads 13-16 map to Play, Record, Stop, and Cycle with automatic icon feedback.
 *   **MIDI Sync:** Optimized for MIDI Channel 10 (Scene 16 GM Drum layout).
@@ -26,11 +26,11 @@ All pads transmit on **MIDI Channel 10** (note-on / note-off). The note numbers 
 | 1   | Row 1 Col 1 | 49 (C#3) | Mute (selected track) |
 | 2   | Row 1 Col 2 | 57 (A3)  | Solo (selected track) |
 | 3   | Row 1 Col 3 | 53 (F3)  | Channel Editor toggle |
-| 4   | Row 1 Col 4 | 51 (D#3) | —                     |
-| 5   | Row 2 Col 1 | 48 (C3)  | Quick Sketch Record   |
-| 6   | Row 2 Col 2 | 47 (B2)  | —                     |
-| 7   | Row 2 Col 3 | 45 (A2)  | —                     |
-| 8   | Row 2 Col 4 | 43 (G2)  | —                     |
+| 4   | Row 1 Col 4 | 51 (D#3) | Quick Sketch Record   |
+| 5   | Row 2 Col 1 | 48 (C3)  | Tap Tempo             |
+| 6   | Row 2 Col 2 | 47 (B2)  | MixConsole 2          |
+| 7   | Row 2 Col 3 | 45 (A2)  | MixConsole 3          |
+| 8   | Row 2 Col 4 | 43 (G2)  | MixConsole 4          |
 | 9   | Row 3 Col 1 | 37 (C#2) | Prev Track            |
 | 10  | Row 3 Col 2 | 39 (D#2) | Next Track            |
 | 11  | Row 3 Col 3 | 56 (G#3) | Undo                  |
