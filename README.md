@@ -93,3 +93,9 @@ bindPad(1).toCommand(mainPage, 'Edit', 'Mute')
 // To debug: temporarily add a value binding callback, or check the console
 // after pressing the pad to confirm the command fires.
 ```
+
+## Troubleshooting
+
+### Resetting Cubase Remote Settings
+
+If you need to reset the Cubase remote settings (e.g., if mappings get corrupted or you want to start fresh), you should delete the relevant files from the following directory `$HOME/Documents/Steinberg/Cubase/MIDI Remote/User Settings`.
