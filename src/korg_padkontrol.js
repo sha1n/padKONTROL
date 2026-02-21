@@ -67,12 +67,17 @@ function getPadNote(padNumber, scene) {
 
 // 4. PAD FACTORY FUNCTIONS
 
+// Records which 1-based pad numbers are toggle pads.
+// Populated by the factory functions below; read by bindPad().toValue().
+var padIsToggle = {}
+
 /**
  * Creates a toggle button pad for the given pad number and scene.
  * Toggle buttons only fire on note-on (ignoring note-off), ideal
  * for Mute / Solo / Channel Editor controls.
  */
 function makeToggleButtonPad(padNumber, scene) {
+    padIsToggle[padNumber] = true
     var pos = getPadGridPosition(padNumber)
     var note = getPadNote(padNumber, scene)
     var btn = surface.makeButton(pos.col, pos.row, 1, 1)
@@ -86,6 +91,7 @@ function makeToggleButtonPad(padNumber, scene) {
  * Trigger pads fire on both note-on and note-off.
  */
 function makeTriggerPad(padNumber, scene) {
+    padIsToggle[padNumber] = false
     var pos = getPadGridPosition(padNumber)
     var note = getPadNote(padNumber, scene)
     var pad = surface.makeTriggerPad(pos.col, pos.row, 1, 1)
@@ -113,44 +119,78 @@ var pads = [
     makeTriggerPad(11, scene),        // Pad 11: Undo
     makeTriggerPad(12, scene),        // Pad 12: Redo
 
-    // Row 4 (Pads 13-16): Trigger Pads — Transport
+    // Row 4 (Pads 13-16): Transport
     makeTriggerPad(13, scene),        // Pad 13: Play
-    makeTriggerPad(14, scene),        // Pad 14: Record
+    makeToggleButtonPad(14, scene),   // Pad 14: Record (latch)
     makeTriggerPad(15, scene),        // Pad 15: Stop
-    makeTriggerPad(16, scene),        // Pad 16: Cycle
+    makeToggleButtonPad(16, scene),   // Pad 16: Cycle  (latch)
 ]
 
 // 6. HOST MAPPING
+
+/**
+ * Returns the mSurfaceValue for a 1-based pad number.
+ */
+function getPadSurfaceValue(padNumber) {
+    return pads[padNumber - 1].mSurfaceValue
+}
+
+/**
+ * Returns a fluent binder for the given 1-based pad number.
+ * Usage:
+ *   bindPad(1).toCommand(page, 'Edit', 'Mute')
+ *   bindPad(2).toValue(page, selectedTrack.mSolo)  // auto-toggle for toggle pads
+ *   bindPad(9).toAction(page, host.mTrackSelection.mAction.mPrevTrack)
+ */
+function bindPad(padNumber) {
+    var sv = getPadSurfaceValue(padNumber)
+    return {
+        toCommand: function (page, category, command) {
+            return page.makeCommandBinding(sv, category, command)
+        },
+        toValue: function (page, hostValue) {
+            var binding = page.makeValueBinding(sv, hostValue)
+            if (padIsToggle[padNumber]) {
+                binding.setTypeToggle()
+            }
+            return binding
+        },
+        toAction: function (page, action) {
+            return page.makeActionBinding(sv, action)
+        }
+    }
+}
+
 var mainPage = deviceDriver.mMapping.makePage('Main Page')
 var host = mainPage.mHostAccess
 
-// Volume & Pan (Selected Track)
+// Knobs: Volume & Pan (Selected Track)
 var selectedTrack = host.mTrackSelection.mMixerChannel.mValue
 mainPage.makeValueBinding(knob1.mSurfaceValue, selectedTrack.mVolume)
 mainPage.makeValueBinding(knob2.mSurfaceValue, selectedTrack.mPan)
 
 // Row 1: Mute, Solo, Channel Editor (Selected Track)
-// Mute uses a command binding ('Edit' > 'Mute') instead of mMute value binding
+// Mute uses a command binding ('Edit' > 'Mute') instead of a value binding
 // to work around a known MIDI Remote API issue with mMute on the selected track.
-mainPage.makeCommandBinding(pads[0].mSurfaceValue, 'Edit', 'Mute')
-mainPage.makeValueBinding(pads[1].mSurfaceValue, selectedTrack.mSolo).setTypeToggle()
-mainPage.makeValueBinding(pads[2].mSurfaceValue, selectedTrack.mEditorOpen).setTypeToggle() // Pad 3: Toggle Channel Editor
+bindPad(1).toCommand(mainPage, 'Edit', 'Mute')
+bindPad(2).toValue(mainPage, selectedTrack.mSolo)
+bindPad(3).toValue(mainPage, selectedTrack.mEditorOpen)
 
-// Row 2: Macros (Pads 5-8)
-mainPage.makeCommandBinding(pads[4].mSurfaceValue, 'Macro', 'Quick Sketch Record') // Pad 5
+// Row 2: Macros
+bindPad(5).toCommand(mainPage, 'Macro', 'Quick Sketch Record')
 
-// Row 3: Track navigation (Pads 9-10), Undo / Redo (Pads 11-12)
-mainPage.makeActionBinding(pads[8].mSurfaceValue, host.mTrackSelection.mAction.mPrevTrack)  // Pad 9:  Prev Track
-mainPage.makeActionBinding(pads[9].mSurfaceValue, host.mTrackSelection.mAction.mNextTrack)  // Pad 10: Next Track
-mainPage.makeCommandBinding(pads[10].mSurfaceValue, 'Edit', 'Undo')                        // Pad 11: Undo
-mainPage.makeCommandBinding(pads[11].mSurfaceValue, 'Edit', 'Redo')                        // Pad 12: Redo
+// Row 3: Track Navigation & Edit
+bindPad(9).toAction(mainPage, host.mTrackSelection.mAction.mPrevTrack)
+bindPad(10).toAction(mainPage, host.mTrackSelection.mAction.mNextTrack)
+bindPad(11).toCommand(mainPage, 'Edit', 'Undo')
+bindPad(12).toCommand(mainPage, 'Edit', 'Redo')
 
-// Row 4: Transport (Pads 13-16) - bind via .mValue for automatic icon feedback
+// Row 4: Transport — bind via .mValue for automatic icon feedback
 var transport = host.mTransport.mValue
-mainPage.makeValueBinding(pads[12].mSurfaceValue, transport.mStart)                     // Pad 13: Play
-mainPage.makeValueBinding(pads[13].mSurfaceValue, transport.mRecord).setTypeToggle()    // Pad 14: Record (latch)
-mainPage.makeValueBinding(pads[14].mSurfaceValue, transport.mStop)                     // Pad 15: Stop
-mainPage.makeValueBinding(pads[15].mSurfaceValue, transport.mCycleActive).setTypeToggle() // Pad 16: Cycle (latch)
+bindPad(13).toValue(mainPage, transport.mStart)
+bindPad(14).toValue(mainPage, transport.mRecord)
+bindPad(15).toValue(mainPage, transport.mStop)
+bindPad(16).toValue(mainPage, transport.mCycleActive)
 
 // 7. OUTPUT BINDINGS - enable Cubase to send state feedback to transport pads
 pads[12].mSurfaceValue.mMidiBinding.setOutputPort(midiOutput)

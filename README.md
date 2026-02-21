@@ -49,20 +49,47 @@ All pads transmit on **MIDI Channel 10** (note-on / note-off). The note numbers 
 
 ## Project Structure
 *   `src/korg_padkontrol.js`: The main JavaScript script for the Cubase MIDI Remote API.
-*   `Makefile`: A simple deployment script to manage file installation.
+*   `Makefile`: Manages script validation (`verify`) and deployment (`deploy`).
+*   `.github/workflows/ci.yml`: GitHub Actions workflow that runs `make verify` on every push and pull request.
 
 ## Installation
 1.  Connect your Korg padKontrol to your Mac.
 2.  The script automatically switches the padKontrol to **Scene 16** on activation (assumes default global MIDI channel 1).
-3.  Deploy the script to the local Cubase directory:
+3.  Deploy the script to the local Cubase directory (automatically validates syntax first):
     ```bash
     make deploy
     ```
 4.  In Cubase 13, open the **MIDI Remote** tab in the Lower Zone and click the **Reload Scripts** button (circular arrow).
 5.  If the device is not automatically detected, use the **MIDI Remote Manager** to manually add the **Korg padKontrol** surface and link it to your MIDI ports.
 
+## Development
+
+Validate the script syntax locally at any time:
+```bash
+make verify
+```
+
+`make deploy` runs `make verify` automatically, so a broken script can never be deployed. The same check runs on CI for every push and pull request.
+
 ## Debugging
 You can monitor the script's activity and any potential errors by opening the **MIDI Remote Scripting Console** in Cubase (`Studio > MIDI Remote Manager > Scripts tab > Open Script Console`).
 
-## License
-MIT
+To add debug output, use `console.log()` anywhere in the script — messages appear in the console in real time:
+
+```js
+deviceDriver.mOnActivate = function (activeDevice) {
+    console.log('padKontrol activated')
+}
+
+mainPage.mOnActivate = function (activeDevice) {
+    console.log('Main Page activated')
+}
+```
+
+You can also log inside bindings or callbacks to trace specific events:
+
+```js
+bindPad(1).toCommand(mainPage, 'Edit', 'Mute')
+// To debug: temporarily add a value binding callback, or check the console
+// after pressing the pad to confirm the command fires.
+```
