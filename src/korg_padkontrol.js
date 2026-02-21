@@ -153,6 +153,7 @@ function bindPad(padNumber) {
             if (padIsToggle[padNumber]) {
                 binding.setTypeToggle()
             }
+            sv.mMidiBinding.setOutputPort(midiOutput)
             return binding
         },
         toAction: function (page, action) {
@@ -194,11 +195,7 @@ bindPad(14).toValue(mainPage, transport.mRecord)
 bindPad(15).toValue(mainPage, transport.mStop)
 bindPad(16).toValue(mainPage, transport.mCycleActive)
 
-// 7. OUTPUT BINDINGS - enable Cubase to send state feedback to transport pads
-pads[12].mSurfaceValue.mMidiBinding.setOutputPort(midiOutput)
-pads[13].mSurfaceValue.mMidiBinding.setOutputPort(midiOutput)
-pads[14].mSurfaceValue.mMidiBinding.setOutputPort(midiOutput)
-pads[15].mSurfaceValue.mMidiBinding.setOutputPort(midiOutput)
+
 
 deviceDriver.mOnActivate = function (activeDevice) {
     console.log('--- [Korg padKontrol] ACTIVE ---')
